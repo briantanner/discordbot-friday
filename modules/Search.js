@@ -29,16 +29,24 @@ class Search {
 
         let id = `${msg.channel.id}${msg.author.id}`;
         this.searches[id] = result.items;
-        return resolve(this.searches[0]);
+        return resolve(this.searches[id][0]);
       });
     });
   }
 
   next(msg) {
-    let id =  `${msg.channel.id}${msg.author.id}`;
+    let id = `${msg.channel.id}${msg.author.id}`;
     if (!this.searches[id]) return;
-    this.searches.shift();
-    return this.searches[0];
+
+    this.searches[id].shift();
+    return this.searches[id][0];
+  }
+
+  get(msg) {
+    let id = `${msg.channel.id}${msg.author.id}`;
+    if (!this.searches[id]) return;
+
+    return this.searches[id][0];
   }
 }
 
