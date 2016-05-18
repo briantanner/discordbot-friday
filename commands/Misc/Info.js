@@ -30,7 +30,7 @@ class Info extends Command {
     
     msgArray.push("```xl");
     msgArray.push("Bot");
-    msgArray.push(`GrepoDiscord  | ${pkg.version}`);
+    msgArray.push(`Friday        | ${pkg.version}`);
     msgArray.push(`Framework     | ${this.config.core.name} ${this.config.core.version}`);
     msgArray.push(`Library       | ${this.config.lib}`);
     msgArray.push(`GitHub        | ${pkg.homepage}`);
