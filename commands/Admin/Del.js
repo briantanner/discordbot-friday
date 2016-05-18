@@ -25,14 +25,18 @@ class Del extends Command {
       if (err) {
         return msg.client.sendMessage(msg.channel, "```" + err + "```");
       }
+
+      let msgs = [];
       
-      messages.forEach(m => {
-        if (deleted >= args[0]) return;
+      for (let m of messages) {
+        if (deleted >= args[0]) continue;
         if (m.author === m.client.user) {
-          msg.client.deleteMessage(m);
+          msgs.push(m);
           deleted++;
         }
-      });
+      };
+
+      msg.client.deleteMessages(msgs);
     });
   }
 }
