@@ -38,8 +38,8 @@ class Player {
     return new Promise((resolve, reject) => {
       this.stop(channel);
       this.client.leaveVoiceChannel(channel).then(() => {
-        this.connections[channel.id].destroy();
-        // delete this.connections[channel.id];
+        // this.connections[channel.id].destroy();
+        delete this.connections[channel.id];
         return resolve();
       }).catch(err => {
         logger.error(err);
