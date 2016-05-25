@@ -2,7 +2,6 @@
 
 const discordbot = require('discordbot-core');
 const logger = discordbot.logger;
-const utils = discordbot.utils;
 const YouTube = require('youtube-node');
 const yt = new YouTube();
 

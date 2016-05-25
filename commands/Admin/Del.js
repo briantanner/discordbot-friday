@@ -36,7 +36,11 @@ class Del extends Command {
         }
       };
 
-      msg.client.deleteMessages(msgs);
+      msg.client.deleteMessages(msgs).then(() => {
+        console.log('Done');
+      }).catch(err => {
+        console.log(err);
+      });
     });
   }
 }

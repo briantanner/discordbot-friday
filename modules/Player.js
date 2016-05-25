@@ -102,7 +102,7 @@ class Player {
           intent.on('end', () => {
             // this.queue[server].push(songObj);
             this.play.bind(this, channel, options);
-          });
+          }.bind(this));
         })
         .catch(err => {
           logger.error('Playback Error: ' + err);
