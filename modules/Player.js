@@ -38,7 +38,6 @@ class Player {
     return new Promise((resolve, reject) => {
       this.stop(channel);
       this.client.leaveVoiceChannel(channel).then(() => {
-        // this.connections[channel.id].destroy();
         delete this.connections[channel.id];
         return resolve();
       }).catch(err => {
@@ -60,9 +59,15 @@ class Player {
 
   remove(msg, index) {
     let server = msg.channel.server.id;
-    index = index - 1;
     if (!this.queue[server]) return;
+    
+    if (!index) {
+      return this.queue[server].shift();
+    }
+
+    index = index - 1;
     this.queue[server].splice(index, 1);
+    this.play(msg.author.voiceChannel);
   }
 
   list(msg) {
@@ -74,35 +79,38 @@ class Player {
   skip(msg) {
     let server = msg.channel.server.id;
     if (!this.queue[server]) return;
-    this.queue[server].push(this.queue[server].shift());
     this.stop(msg.author.voiceChannel);
-    return this.play(msg.author.voiceChannel);
   }
 
   play(channel, options) {
     let server = channel.server.id;
     if (!this.queue[server]) return Promise.reject('No songs in queue.');
+    if (this.connections[channel.id]) {
+      this.connections[channel.id].stopPlaying();
+    }
 
     return new Promise((resolve, reject) => {
       this.createConnection(channel).then(connection => {
+
         let songObj = this.queue[server][0],
             url = `https://www.youtube.com/watch?v=${songObj.id.videoId}`,
-            stream = ytdl(url);
+            stream = ytdl(url, { audioonly: true, stereo: true });
 
         stream.on('error', err => {
           logger.error('Stream Error: ' + err);
         });
 
-        connection.playRawStream(stream, { stereo: true })
+        connection.playRawStream(stream)
         .then(intent => {
           intent.on('error', err => {
-            logger.error('Intent Error: ' + err);
+            logger.error(err);
           });
 
           intent.on('end', () => {
             // this.queue[server].push(songObj);
-            this.play.bind(this, channel, options);
-          }.bind(this));
+            this.queue[server].push( this.queue[server].shift() );
+            this.play.call(this, channel, options);
+          });
         })
         .catch(err => {
           logger.error('Playback Error: ' + err);
