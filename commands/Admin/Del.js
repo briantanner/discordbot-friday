@@ -34,7 +34,7 @@ class Del extends Command {
           msgs.push(m);
           deleted++;
         }
-      };
+      }
 
       msg.client.deleteMessages(msgs).then(() => {
         console.log('Done');

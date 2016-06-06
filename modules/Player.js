@@ -2,7 +2,6 @@
 
 const discordbot = require('discordbot-core');
 const logger = discordbot.logger;
-const utils = discordbot.utils;
 const ytdl = require('ytdl-core');
 
 class Player {
@@ -94,7 +93,7 @@ class Player {
 
         let songObj = this.queue[server][0],
             url = `https://www.youtube.com/watch?v=${songObj.id.videoId}`,
-            stream = ytdl(url, { audioonly: true, stereo: true });
+            stream = ytdl(url, { audioonly: true });
 
         stream.on('error', err => {
           logger.error('Stream Error: ' + err);

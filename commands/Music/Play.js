@@ -1,6 +1,5 @@
 "use strict";
 
-const path = require('path');
 const Command = require('discordbot-core').Command;
 
 class Play extends Command {
@@ -32,32 +31,29 @@ class Play extends Command {
     super.execute.apply(this, arguments);
     if (!this.validate(args, 1)) return;
 
-    const player = msg.client.getModule('Player');
+    let player = msg.client.getModule('Player'),
+        list, result;
 
     switch(args[0]) {
       case 'list':
-        let list = player.list(msg);
+        list = player.list(msg);
         if (!list) return this.sendMessage("The queue is empty.");
         return this.sendMessage(this.formatList(list));
-        break;
       case 'start':
         if (!msg.author.voiceChannel) {
           return this.sendMessage("You must join a voice channel first.");
         }
         return player.play(msg.author.voiceChannel);
-        break;
       case 'stop':
         if (!msg.author.voiceChannel) {
           return this.sendMessage("You must be in the channel to use this.");
         }
         return player.stop(msg.author.voiceChannel);
-        break;
       case 'skip':
         if (!msg.author.voiceChannel) {
           return this.sendMessage("You must be in the channel to use this.");
         }
         return player.skip(msg);
-        break;
       case 'remove':
         if (args[1] && !isNaN(parseInt(args[1], 10))) {
           return player.remove(msg, args[1]);
@@ -67,13 +63,10 @@ class Play extends Command {
           return this.sendMessage("You must be in the channel to use this.");
         }
 
-        let result = player.remove(msg);
+        result = player.remove(msg);
         return this.sendMessage(`Removed ${result.snippet.title}`);
-
-        break;
       case 'destroy':
         return player.destroyConnection(msg.author.voiceChannel);
-        break;
     }
 
     // player.play(msg.author.voiceChannel, args[0]);

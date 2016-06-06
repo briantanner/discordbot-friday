@@ -36,13 +36,11 @@ class Search extends Command {
         result = search.next(msg);
         if (!result) return this.sendMessage("No more results.");
         return this.sendMessage(this.formatMessage(result));
-        break;
       case 'add':
         result = search.get(msg);
         if (!result) return this.sendMessage("Failed to get last search.");
         player.add(msg, result);
         return this.sendMessage(`Added ${result.snippet.title} to the queue.`);
-        break;
     }
 
     if (args[0] === 'next') {
@@ -54,7 +52,7 @@ class Search extends Command {
     search.find(msg, args.join(' ')).then(result => {
       if (!result) return this.sendMessage("Failed to get search results.");
       this.sendMessage(this.formatMessage(result));
-    }).catch(err => {
+    }).catch(() => {
       this.sendMessage("Failed to get search results.");
     });
   }

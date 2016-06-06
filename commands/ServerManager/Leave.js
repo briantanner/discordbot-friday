@@ -1,6 +1,5 @@
 "use strict";
 
-const util = require('util');
 const Command = require('discordbot-core').Command;
 
 class Leave extends Command {

@@ -1,12 +1,8 @@
 "use strict";
 
-const util = require('util');
 const os = require('os');
-const moment = require('moment');
 const Command = require('discordbot-core').Command;
 const pkg = require('../../package.json');
-
-require("moment-duration-format");
 
 class Info extends Command {
   
@@ -24,8 +20,7 @@ class Info extends Command {
     super.execute.apply(this, arguments);
     if (!this.validate(args)) return;
     
-    let uptime = moment.duration(process.uptime(), "seconds"),
-        cpus = os.cpus(),
+    let cpus = os.cpus(),
         msgArray = [];
     
     msgArray.push("```xl");

@@ -1,7 +1,5 @@
 "use strict";
 
-const discordbot = require('discordbot-core');
-const logger = discordbot.logger;
 const YouTube = require('youtube-node');
 const yt = new YouTube();
 
