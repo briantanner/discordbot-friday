@@ -11,7 +11,7 @@
     "no-console": 0,
     "no-control-regex": 0,
     "no-redeclare": 0,
-    "no-inner-declarations": 0,
+    "no-inner-declarations": 0
   },
-  extends: "eslint:recommended"
+  "extends": "eslint:recommended"
 }
