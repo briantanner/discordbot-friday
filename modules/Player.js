@@ -137,7 +137,7 @@ class Player {
     if (!this.queue[server]) return;
     this.stop(msg.author.voiceChannel);
     this.queue[server].push( this.queue[server].shift() );
-    this.play.call(this, channel, options);
+    this.play.call(this, msg.author.voiceChannel);
   }
 
   /**
