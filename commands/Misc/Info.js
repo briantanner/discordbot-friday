@@ -13,13 +13,10 @@ class Info extends Command {
     this.group = "Misc";
     this.description = "Get bot info/stats.";
     this.usage = "info";
-    this.hideFromHelp = true;
+    this.expectedArgs = 0;
   }
 
-  execute(msg, args) {
-    super.execute.apply(this, arguments);
-    if (!this.validate(args)) return;
-    
+  execute(msg) {
     let cpus = os.cpus(),
         msgArray = [];
     

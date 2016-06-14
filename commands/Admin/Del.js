@@ -13,12 +13,10 @@ class Del extends Command {
     this.usage = "del";
     this.hideFromHelp = true;
     this.permissions = "admin";
+    this.expectedArgs = 1;
   }
   
   execute(msg, args) {
-    super.execute.apply(this, arguments);
-    if (!this.validate(args, 1)) return;
-    
     let deleted = 0;
     
     msg.client.getChannelLogs(msg.channel, (err, messages) => {
