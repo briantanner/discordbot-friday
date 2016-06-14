@@ -103,7 +103,8 @@ class Search {
     return result.items.map(item => {
       // normalize item type
       let type = item.id ? item.id.kind || item.kind : item.kind,
-        id = item.id ? item.id.videoId || item.id.playlistId : item.contentDetails ? item.contentDetails.videoId : null;
+        id = (item.id && typeof item.id === 'object') ? item.id.videoId || item.id.playlistId : 
+          (item.contentDetails) ? item.contentDetails.videoId : null;
 
       type = type.replace('youtube#', '');
 
@@ -171,6 +172,7 @@ class Search {
     if (arguments.length < 2) return Promise.reject('Not enough arguments given.');
     
     return new Promise((resolve, reject) => {
+      yt.addParam('maxResults', 50);
       yt.getPlayListsItemsById(id, (err, result) => {
         if (err) return reject(err);
         return resolve(this.parseItems(result));

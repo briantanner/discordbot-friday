@@ -60,6 +60,87 @@ class Player {
   }
 
   /**
+   * Start playing the queue
+   * @param  {Object} channel discord.js channel resolvable
+   * @param  {Object} options Options to pass to playRawStream
+   * @return {Promise}        
+   */
+  play(channel, options) {
+    return new Promise((resolve, reject) => {
+      let server = channel.server.id;
+      
+      if (!this.queue[server]) return Promise.reject('No songs in queue.');
+      
+      if (this.connections[channel.id] && this.connections[channel.id].conn) {
+        this.connections[channel.id].conn.stopPlaying();
+      }
+
+      this.getConnection(channel).then(connection => {
+
+        let songObj = this.queue[server][0],
+            url = `https://www.youtube.com/watch?v=${songObj.id}`,
+            stream = ytdl(url, { audioonly: true });
+
+        stream.on('error', logger.error);
+
+        connection.playRawStream(stream)
+        .then(intent => {
+          intent.on('error', logger.error);
+
+          intent.on('end', () => {
+            let connection = this.connections[channel.id];
+            if (connection.stopping === true) {
+              return connection.stopping = false;
+            }
+
+            this.queue[server].push( this.queue[server].shift() );
+            this.play.call(this, channel, options);
+          });
+        })
+        .catch(logger.error);
+        
+        return resolve();
+      }).catch(reject);
+    });
+  }
+
+  /**
+   * Play a file from disk
+   * @param  {Object} channel discord.js channel resolvable
+   * @param  {String} file    File path to play
+   * @param  {Object} options Options to pass to playFile
+   * @return {Promise}        
+   */
+  playFile(channel, file, options) {
+    return new Promise((resolve, reject) => {
+      this.getConnection(channel).then(connection => {
+        connection.playFile(file, options).then(resolve).catch(reject);
+      }).catch(reject);
+    });
+  }
+
+  /**
+   * Stop playing
+   * @param  {Object} channel discord.js channel resolvable
+   */
+  stop(channel) {
+    this.connections[channel.id].stopping = true;
+    this.connections[channel.id].conn.stopPlaying();
+  }
+
+  /**
+   * Skip song
+   * @param  {Object} msg discord.js message resolvable
+   */
+  skip(msg) {
+    let server = msg.channel.server.id;
+    if (!this.queue[server]) return;
+    this.stop(msg.author.voiceChannel);
+    this.queue[server].push( this.queue[server].shift() );
+    this.play.call(this, channel, options);
+  }
+
+  /**
    * Add song to queue
    * @param {Object} msg     discord.js message resolvable
    * @param {Object} songObj Youtube song object
@@ -97,83 +178,6 @@ class Player {
     let server = msg.channel.server.id;
     if (!this.queue[server]) return;
     return this.queue[server];
-  }
-
-  /**
-   * Skip song
-   * @param  {Object} msg discord.js message resolvable
-   */
-  skip(msg) {
-    let server = msg.channel.server.id;
-    if (!this.queue[server]) return;
-    this.stop(msg.author.voiceChannel);
-  }
-
-  /**
-   * Start playing the queue
-   * @param  {Object} channel discord.js channel resolvable
-   * @param  {Object} options Options to pass to playRawStream
-   * @return {Promise}        
-   */
-  play(channel, options) {
-    return new Promise((resolve, reject) => {
-      let server = channel.server.id;
-      
-      if (!this.queue[server]) return Promise.reject('No songs in queue.');
-      
-      if (this.connections[channel.id] && this.connections[channel.id].conn) {
-        this.connections[channel.id].conn.stopPlaying();
-      }
-
-      this.getConnection(channel).then(connection => {
-
-        let songObj = this.queue[server][0],
-            url = `https://www.youtube.com/watch?v=${songObj.id}`,
-            stream = ytdl(url, { audioonly: true });
-
-        stream.on('error', logger.error);
-
-        connection.playRawStream(stream)
-        .then(intent => {
-          intent.on('error', logger.error);
-
-          intent.on('end', () => {
-            if (this.connections[channel.id].stopping === true) {
-              return this.connections[channel.id].stopping = false;
-            }
-
-            this.queue[server].push( this.queue[server].shift() );
-            this.play.call(this, channel, options);
-          });
-        })
-        .catch(logger.error);
-        
-        return resolve();
-      }).catch(reject);
-    });
-  }
-
-  /**
-   * Play a file from disk
-   * @param  {Object} channel discord.js channel resolvable
-   * @param  {String} file    File path to play
-   * @param  {Object} options Options to pass to playFile
-   * @return {Promise}        
-   */
-  playFile(channel, file, options) {
-    return new Promise((resolve, reject) => {
-      this.getConnection(channel).then(connection => {
-        connection.playFile(file, options).then(resolve).catch(reject);
-      }).catch(reject);
-    });
-  }
-
-  /**
-   * Stop playing
-   * @param  {Object} channel discord.js channel resolvable
-   */
-  stop(channel) {
-    this.connections[channel.id].stopping = true;
   }
 
   /**

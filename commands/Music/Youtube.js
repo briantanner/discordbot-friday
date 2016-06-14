@@ -20,6 +20,37 @@ class Youtube extends Command {
   }
 
   /**
+   * Utility function to partition array by string length
+   * @param  {Array} arr  Array to partition
+   * @param  {Number} len String length of partition
+   * @return {Array}      Partitioned array
+   */
+  partitionArray(msgArray) {
+    // Convert to string
+    let msgArrays = [],
+        msgString = msgArray.join("\n");
+
+    // Split string by 2000 characters (discord message limit)
+    if (msgString.length > 2000) {
+      let str = '', pos;
+      while (msgString.length > 0) {
+        if (msgString.length > 2000) {
+          pos = msgString.lastIndexOf("\n",2000);
+        } else {
+          pos = msgString.length;
+        }
+        str = msgString.substr(0, pos);
+        msgString = msgString.substr(pos);
+        msgArrays.push(str);
+      }
+    } else {
+      msgArrays.push(msgString);
+    }
+
+    return msgArrays;
+  }
+
+  /**
    * Format search result
    * @param  {Object} result Search item object
    * @return {Array}         Message array
@@ -46,14 +77,12 @@ class Youtube extends Command {
     let msgArray = [],
         result;
 
-    msgArray.push("```");
     for (let i in results) {
       result = results[i];
       msgArray.push(`${++i}: ${result.title}`);
     }
-    msgArray.push("```");
 
-    return msgArray;
+    return this.partitionArray(msgArray, 2000);
   }
 
   /**
@@ -143,7 +172,10 @@ class Youtube extends Command {
   list(msg) {
     const list = this.player.list(msg);
     if (!list) return this.sendMessage("The queue is empty.");
-    this.sendMessage(this.formatList(list));
+    let lists = this.formatList(list);
+    for (let list of lists) {
+      this.sendMessage("```" + list + "```");
+    }
   }
 
   /**
